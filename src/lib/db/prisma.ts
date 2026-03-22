@@ -16,5 +16,5 @@ export const getPrisma = () => {
   }
 };
 
-// Export only the getter
-// export const prisma = getPrisma(); // Disabled module-level init
+// Export the singleton instance
+export const prisma = getPrisma() as PrismaClient;
