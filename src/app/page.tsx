@@ -26,6 +26,38 @@ export default function LandingPage() {
   const [recent, setRecent] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Typewriter effect for search bar
+  const searchPhrases = [
+    "gta 5 is free to everyone...",
+    "election results delayed due to fraud...",
+    "new AI model passes bar exam...",
+    "is coffee actually bad for you?"
+  ];
+  const [placeholderText, setPlaceholderText] = useState("");
+  const [phraseIndex, setPhraseIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const currentPhrase = searchPhrases[phraseIndex];
+    let timeout: NodeJS.Timeout;
+
+    if (isDeleting) {
+      if (placeholderText.length > 0) {
+        timeout = setTimeout(() => setPlaceholderText(currentPhrase.substring(0, placeholderText.length - 1)), 30);
+      } else {
+        setIsDeleting(false);
+        setPhraseIndex(prev => (prev + 1) % searchPhrases.length);
+      }
+    } else {
+      if (placeholderText.length < currentPhrase.length) {
+        timeout = setTimeout(() => setPlaceholderText(currentPhrase.substring(0, placeholderText.length + 1)), 80);
+      } else {
+        timeout = setTimeout(() => setIsDeleting(true), 2500);
+      }
+    }
+    return () => clearTimeout(timeout);
+  }, [placeholderText, isDeleting, phraseIndex]);
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -65,7 +97,6 @@ export default function LandingPage() {
 
   const STAT_CARDS = [
     { value: stats.totalVerified, label: 'Articles Verified' },
-    { value: stats.accuracy, label: 'Accuracy Rate' },
     { value: stats.sources, label: 'Sources Tracked' },
     { value: stats.models, label: 'AI Models Running' },
   ];
@@ -77,52 +108,44 @@ export default function LandingPage() {
   return (
     <main>
       {/* ── HERO ── */}
-      <section style={{ maxWidth: 1280, margin: '0 auto', padding: '80px 24px 64px' }}>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 360px', gap:64, alignItems:'start' }} className="hero-grid">
-          <div className="animate-fadeUp">
-            <div style={{ display:'inline-flex', alignItems:'center', gap:8, padding:'6px 14px', borderRadius:'var(--radius-full)', background:'var(--cyan-dim)', border:'1px solid var(--border-active)', marginBottom:24 }}>
-              <span style={{ width:8, height:8, borderRadius:'50%', background:'var(--cyan)', display:'inline-block' }} />
-              <span style={{ fontSize:'var(--text-xs)', color:'var(--cyan)', fontFamily:'Syne, sans-serif', fontWeight:700, letterSpacing:'0.1em' }}>AI-POWERED TRUTH ENGINE</span>
-            </div>
-            <h1 className="font-syne" style={{ fontSize:'clamp(2.5rem, 8vw, 5rem)', fontWeight:900, lineHeight:1.05, letterSpacing:'-0.03em', marginBottom:24, color:'var(--text-primary)' }}>
-              Verify Before<br />
-              <span className="text-gradient">You Share.</span>
-            </h1>
-            <p style={{ fontSize:'var(--text-lg)', color:'var(--text-secondary)', lineHeight:1.7, marginBottom:36, maxWidth:500 }}>
-              {HERO_SUBTEXT}
-            </p>
-            <div style={{ display:'flex', gap:12, flexWrap:'wrap', marginBottom:36 }}>
-              <Link href="/upload">
-                <PrimaryButton style={{ padding:'16px 32px', fontSize:'var(--text-md)' }} className="hover-lift">
-                  Start Verifying Now →
-                </PrimaryButton>
-              </Link>
-              <Link href="/feed">
-                <SecondaryButton style={{ padding:'16px 32px', fontSize:'var(--text-md)' }} className="hover-lift">
-                  Explore Trending
-                </SecondaryButton>
-              </Link>
-            </div>
-            <div style={{ display:'flex', gap:20, flexWrap:'wrap' }}>
-              {['No account needed', 'Free to use', '12 AI models'].map(x => (
-                <span key={x} style={{ display:'flex', alignItems:'center', gap:6, fontSize:'var(--text-sm)', color:'var(--text-secondary)' }}>
-                  <CheckCircle size={15} color="var(--verified)" /> {x}
-                </span>
-              ))}
-            </div>
+      <section style={{ maxWidth: 1000, margin: '0 auto', padding: '120px 24px 80px', textAlign: 'center', position: 'relative' }}>
+        {/* Glow Effects */}
+        <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translate(-50%, -20%)', width: '80%', height: 400, background: 'radial-gradient(ellipse at top, rgba(124, 58, 237, 0.2), transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
+        
+        <div style={{ position: 'relative', zIndex: 1 }} className="animate-fadeUp">
+          <div style={{ display:'inline-flex', alignItems:'center', gap:8, padding:'6px 14px', borderRadius:'var(--radius-full)', background:'var(--bg-elevated)', border:'1px solid var(--border)', marginBottom:32 }}>
+            <span style={{ fontSize:'var(--text-xs)', color:'var(--text-muted)', fontFamily:'Syne, sans-serif', fontWeight:800, letterSpacing:'0.05em' }}>✦ NEXT-GEN AUTHENTICITY ENGINE</span>
           </div>
+          
+          <h1 className="font-syne" style={{ fontSize:'clamp(3rem, 7vw, 5.5rem)', fontWeight:900, lineHeight:1.1, letterSpacing:'-0.03em', marginBottom:24, color:'var(--text-primary)', textShadow: '0 0 40px rgba(255,255,255,0.2)' }}>
+            Verify before you trust
+          </h1>
+          
+          <p style={{ fontSize:'var(--text-lg)', color:'var(--text-secondary)', lineHeight:1.6, marginBottom:48, maxWidth:640, margin: '0 auto 48px' }}>
+            Advanced AI detection, source triangulation, and semantic analysis to find the truth behind any claim in seconds.
+          </p>
 
-          <div className="hero-feed animate-fadeUp" style={{ animationDelay: '200ms' }}>
-             <TrendingFeed />
-          </div>
+          <form action="/upload" method="GET" style={{ maxWidth: 700, margin: '0 auto', position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <div style={{ position: 'absolute', left: 20, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </div>
+            <input name="q" placeholder={placeholderText} style={{ width: '100%', padding: '20px 20px 20px 52px', borderRadius: 'var(--radius-full)', background: 'var(--bg-input)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 'var(--text-md)', outline: 'none', boxShadow: '0 0 40px rgba(124, 58, 237, 0.1)', transition: 'border-color 200ms' }} onFocus={e => (e.target.style.borderColor = 'var(--cyan)')} onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+            <div style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)' }}>
+               <button type="submit" style={{ background: '#FFFFFF', color: '#000000', padding: '12px 24px', borderRadius: 'var(--radius-full)', fontWeight: 700, fontSize: 'var(--text-sm)', border: 'none', cursor: 'pointer', transition: 'transform 0.2s', fontFamily: 'Syne, sans-serif' }}
+                 onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.02)')}
+                 onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}>
+                 Analyze
+               </button>
+            </div>
+          </form>
         </div>
       </section>
 
       {/* ── STATS BAR ── */}
       <section style={{ background:'var(--bg-surface)', borderTop:'1px solid var(--border)', borderBottom:'1px solid var(--border)' }}>
-        <div style={{ maxWidth:1280, margin:'0 auto', padding:'32px 24px', display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:0 }} className="stats-grid">
+        <div style={{ maxWidth:1280, margin:'0 auto', padding:'32px 24px', display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:0 }} className="stats-grid">
           {STAT_CARDS.map((s, i) => (
-            <div key={s.label} style={{ textAlign:'center', padding:'16px 24px', borderRight: i < 3 ? '1px solid var(--border)' : 'none' }}>
+            <div key={s.label} style={{ textAlign:'center', padding:'16px 24px', borderRight: i < 2 ? '1px solid var(--border)' : 'none' }}>
               <div className="font-syne font-mono" style={{ fontSize:'clamp(1.75rem,3vw,2.5rem)', fontWeight:900, color:'var(--cyan)', letterSpacing:'-0.02em' }}>{s.value}</div>
               <div style={{ fontSize:'var(--text-sm)', color:'var(--text-secondary)', marginTop:4 }}>{s.label}</div>
             </div>
@@ -225,8 +248,8 @@ export default function LandingPage() {
             {/* Links Columns */}
             {[
               { title: 'Product', links: [['Verify Content', '/upload'], ['Global Feed', '/feed'], ['Analytics', '/analytics'], ['API Docs', '#']] },
-              { title: 'Resources', links: [['Source Directory', '/sources'], ['Fact Check Tips', '#'], ['Community', '#'], ['Support', '#']] },
-              { title: 'Company', links: [['About Us', '#'], ['Careers', '#'], ['Privacy', '#'], ['Terms', '#']] }
+              { title: 'Resources', links: [['Source Directory', '/sources'], ['Fact Check Tips', '#'], ['Community', '#'], ['Contact Support', '/contact']] },
+              { title: 'Company', links: [['Why Us?', '/about'], ['Careers', '#'], ['Privacy', '#'], ['Terms', '#']] }
             ].map(col => (
               <div key={col.title}>
                 <h4 className="font-syne" style={{ fontSize:'var(--text-xs)', fontWeight:800, color:'var(--text-primary)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:20 }}>{col.title}</h4>

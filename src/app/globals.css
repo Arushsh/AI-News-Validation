@@ -2,34 +2,34 @@
 
 :root {
   /* Brand */
-  --cyan: #00D4FF;
-  --cyan-dim: #00D4FF22;
-  --cyan-glow: 0 0 24px #00D4FF55;
+  --cyan: #3F3F46; /* Dark slate replacing purple */
+  --cyan-dim: rgba(63, 63, 70, 0.2);
+  --cyan-glow: 0 0 32px rgba(63, 63, 70, 0.4);
 
   /* Backgrounds */
-  --bg-base: #0A0C0F;
-  --bg-surface: #111318;
-  --bg-elevated: #181C23;
-  --bg-card: #1A1F28;
-  --bg-input: #0F1117;
-  --bg-overlay: rgba(10,12,15,0.85);
+  --bg-base: #000000; /* Pure Black base */
+  --bg-surface: #050505;
+  --bg-elevated: #080808;
+  --bg-card: #0A0A0A;
+  --bg-input: #030303;
+  --bg-overlay: rgba(3,3,8,0.85);
 
   /* Borders */
-  --border: #252A35;
-  --border-active: #00D4FF66;
+  --border: #222238;
+  --border-active: #818CF866;
 
   /* Text */
-  --text-primary: #F0F4FF;
-  --text-secondary: #8892AA;
-  --text-muted: #4A5265;
+  --text-primary: #FFFFFF;
+  --text-secondary: #9CA3AF;
+  --text-muted: #6B7280;
 
   /* Status */
   --verified: #10B981;
-  --verified-bg: #10B98115;
+  --verified-bg: rgba(16, 185, 129, 0.15);
   --suspicious: #F59E0B;
-  --suspicious-bg: #F59E0B15;
+  --suspicious-bg: rgba(245, 158, 11, 0.15);
   --fake: #EF4444;
-  --fake-bg: #EF444415;
+  --fake-bg: rgba(239, 68, 68, 0.15);
 
   /* Typography Scale */
   --text-xs: 0.75rem;
@@ -55,7 +55,8 @@
 html { scroll-behavior: smooth; }
 
 body {
-  background: var(--bg-base);
+  background: linear-gradient(135deg, rgb(0, 0, 0) 0%, rgb(10, 10, 10) 100%);
+  background-attachment: fixed;
   color: var(--text-primary);
   font-family: 'DM Sans', sans-serif;
   font-size: var(--text-md);
@@ -128,7 +129,7 @@ body {
 }
 
 .text-gradient {
-  background: linear-gradient(to right, #00D4FF, #34d399);
+  background: linear-gradient(to right, #FFFFFF, #71717A);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;

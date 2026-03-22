@@ -10,6 +10,8 @@ const NAV_LINKS = [
   { href: '/upload', label: 'Verify' },
   { href: '/analytics', label: 'Analytics' },
   { href: '/sources', label: 'Sources' },
+  { href: '/about', label: 'Why Us' },
+  { href: '/contact', label: 'Contact' },
 ];
 
 export function Navbar() {
@@ -25,13 +27,18 @@ export function Navbar() {
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px', height: 64, display: 'flex', alignItems: 'center', gap: 32 }}>
         
         {/* Logo */}
-        <Link href="/" style={{ display:'flex', alignItems:'center', gap: 8, textDecoration:'none' }}>
-          <div style={{ width:32, height:32, borderRadius:8, background:'var(--cyan)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-            <Shield size={18} color="#0A0C0F" strokeWidth={2.5} />
+        <Link href="/" style={{ display:'flex', alignItems:'center', gap: 12, textDecoration:'none' }}>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(59, 130, 246, 0.1))', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(124, 58, 237, 0.3)' }}>
+            <Shield size={20} color="#A78BFA" strokeWidth={2} />
           </div>
-          <span className="font-syne mobile-logotext" style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-            VERIFYLENS<span className="text-gradient">X</span>
-          </span>
+          <div className="mobile-logotext" style={{ display: 'flex', flexDirection: 'column' }}>
+            <span style={{ fontSize: 20, fontWeight: 800, color: '#e8e1fbff', letterSpacing: '-0.02em', lineHeight: 1 }}>
+              VerifyLens
+            </span>
+            <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-secondary)', letterSpacing: '0.1em', marginTop: 4 }}>
+              VERIFY BEFORE YOU TRUST
+            </span>
+          </div>
         </Link>
 
         {/* Desktop Nav */}
@@ -52,12 +59,12 @@ export function Navbar() {
           ))}
         </nav>
 
-        {/* CTA Buttons */}
-        <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+        {/* Right Actions */}
+        <div style={{ display:'flex', gap:16, alignItems:'center' }}>
           <Link href="/upload" className="hover-lift btn-glow" style={{
             padding: '8px 20px', borderRadius: 'var(--radius-full)',
-            background: 'var(--cyan)', color: '#0A0C0F',
-            fontWeight: 700, fontSize: 'var(--text-sm)',
+            background: 'var(--text-primary)', color: 'var(--bg-base)',
+            fontWeight: 800, fontSize: 'var(--text-sm)',
             textDecoration: 'none', fontFamily: 'Syne, sans-serif'
           }}>
             Verify Now
