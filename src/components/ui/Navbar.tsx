@@ -29,8 +29,8 @@ export function Navbar() {
           <div style={{ width:32, height:32, borderRadius:8, background:'var(--cyan)', display:'flex', alignItems:'center', justifyContent:'center' }}>
             <Shield size={18} color="#0A0C0F" strokeWidth={2.5} />
           </div>
-          <span className="font-syne" style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-            VERIDY<span className="text-gradient">X</span>
+          <span className="font-syne mobile-logotext" style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+            VERIFYLENS<span className="text-gradient">X</span>
           </span>
         </Link>
 
@@ -88,6 +88,10 @@ export function Navbar() {
         @media (max-width: 1024px) {
           .desktop-nav { display: none !important; }
           .mobile-menu-btn { display: flex !important; }
+        }
+        @media (max-width: 480px) {
+          .mobile-logotext { display: none !important; }
+          .btn-glow { padding: 6px 14px !important; font-size: 12px !important; }
         }
       `}</style>
     </header>

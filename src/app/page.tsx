@@ -84,7 +84,7 @@ export default function LandingPage() {
               <span style={{ width:8, height:8, borderRadius:'50%', background:'var(--cyan)', display:'inline-block' }} />
               <span style={{ fontSize:'var(--text-xs)', color:'var(--cyan)', fontFamily:'Syne, sans-serif', fontWeight:700, letterSpacing:'0.1em' }}>AI-POWERED TRUTH ENGINE</span>
             </div>
-            <h1 className="font-syne" style={{ fontSize:'clamp(3rem, 6vw, 5rem)', fontWeight:900, lineHeight:1.05, letterSpacing:'-0.03em', marginBottom:24, color:'var(--text-primary)' }}>
+            <h1 className="font-syne" style={{ fontSize:'clamp(2.5rem, 8vw, 5rem)', fontWeight:900, lineHeight:1.05, letterSpacing:'-0.03em', marginBottom:24, color:'var(--text-primary)' }}>
               Verify Before<br />
               <span className="text-gradient">You Share.</span>
             </h1>
@@ -208,7 +208,7 @@ export default function LandingPage() {
             {/* Brand Column */}
             <div>
               <div className="font-syne" style={{ fontSize:24, fontWeight:900, color:'var(--text-primary)', marginBottom:20 }}>
-                VERIDY<span style={{ color:'var(--cyan)' }}>X</span>
+                VERIFYLENS<span style={{ color:'var(--cyan)' }}>X</span>
               </div>
               <p style={{ color:'var(--text-secondary)', fontSize:'var(--text-sm)', lineHeight:1.6, maxWidth:240, marginBottom:24 }}>
                 The world's most advanced AI-powered verification engine. Protecting the truth in the age of synthetic media.
@@ -258,16 +258,21 @@ export default function LandingPage() {
         @media (max-width: 1024px) {
           .hero-grid { grid-template-columns: 1fr !important; text-align: center; }
           .hero-grid > div { margin: 0 auto; }
-          .hero-feed { order: 2; width: 100% !important; max-width: 400px; }
+          .hero-feed { order: 2; width: 100% !important; max-width: 500px; }
           .stats-grid { grid-template-columns: repeat(2,1fr) !important; }
           .steps-grid { grid-template-columns: 1fr !important; }
           .cat-grid { grid-template-columns: repeat(3,1fr) !important; }
-          .recent-grid { grid-template-columns: 1fr !important; }
-          .footer-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+          .recent-grid { grid-template-columns: repeat(2,1fr) !important; }
+          .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
         }
         @media (max-width: 768px) {
-          .stats-grid { grid-template-columns: repeat(2,1fr) !important; }
+          .recent-grid { grid-template-columns: 1fr !important; }
           .cat-grid { grid-template-columns: repeat(2,1fr) !important; }
+          .footer-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 480px) {
+          .stats-grid { grid-template-columns: 1fr !important; }
+          .cat-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </main>

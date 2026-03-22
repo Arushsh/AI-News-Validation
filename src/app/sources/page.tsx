@@ -39,9 +39,9 @@ export default function SourcesPage() {
           onFocus={e=>(e.target.style.borderColor='var(--cyan)')} onBlur={e=>(e.target.style.borderColor='var(--border)')} />
       </div>
 
-      <div style={{ display:'grid', gridTemplateColumns: selected ? '1fr 360px' : '1fr', gap:24, alignItems:'start' }}>
+      <div className="sources-grid" style={{ display:'grid', gridTemplateColumns: selected ? '1fr 360px' : '1fr', gap:24, alignItems:'start' }}>
         {/* Table */}
-        <Card style={{ padding:0, overflow:'hidden' }}>
+        <Card style={{ padding:0, overflowX:'auto' }}>
           <table style={{ width:'100%', borderCollapse:'collapse' }}>
             <thead>
               <tr style={{ background:'var(--bg-elevated)', borderBottom:'1px solid var(--border)' }}>
@@ -107,6 +107,11 @@ export default function SourcesPage() {
           </Card>
         )}
       </div>
+      <style>{`
+        @media (max-width: 1024px) {
+          .sources-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </main>
   );
 }
