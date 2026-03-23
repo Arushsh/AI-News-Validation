@@ -121,7 +121,7 @@ export default function LandingPage() {
             Verify before you trust
           </h1>
           
-          <p style={{ fontSize:'var(--text-lg)', color:'var(--text-secondary)', lineHeight:1.6, marginBottom:48, maxWidth:640, margin: '0 auto 48px' }}>
+          <p style={{ fontSize:'var(--text-lg)', color:'var(--text-secondary)', lineHeight:1.6, maxWidth:640, marginTop: 0, marginRight: 'auto', marginBottom: 48, marginLeft: 'auto' }}>
             Advanced AI detection, source triangulation, and semantic analysis to find the truth behind any claim in seconds.
           </p>
 

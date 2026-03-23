@@ -8,6 +8,7 @@ const NAV_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/feed', label: 'Explore' },
   { href: '/upload', label: 'Verify' },
+  { href: '/premium', label: 'Premium' },
   { href: '/analytics', label: 'Analytics' },
   { href: '/sources', label: 'Sources' },
   { href: '/about', label: 'Why Us' },

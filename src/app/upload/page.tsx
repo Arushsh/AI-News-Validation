@@ -117,9 +117,22 @@ export default function UploadPage() {
   };
 
   const canVerify = (['image', 'video', 'audio'].includes(tab) && file) || (tab === 'url' && url.trim()) || (tab === 'text' && text.trim().length > 10);
+  const isImageTab = tab === 'image';
+  // For images, use a stricter threshold: 82+ = authentic, 50-81 = suspicious, <50 = manipulated
+  const authThreshHigh = isImageTab ? 82 : 75;
+  const authThreshMid  = isImageTab ? 50 : 45;
   const authScore = result ? (result.authenticity_score ?? 50) : 0;
   const aiProb    = result ? (result.ai_generated_probability ?? (100 - authScore)) : 0;
+  const manipulationDetected = result?.manipulation_detected ?? false;
+  const manipulationTypes    = result?.manipulation_types ?? [];
   const explanation = result ? (result.explanation ?? result.error ?? '') : '';
+
+  // Image-aware verdict labels
+  const verdictHigh = isImageTab ? 'AUTHENTIC IMAGE' : 'AUTHENTIC / REAL NEWS';
+  const verdictMid  = isImageTab ? 'POTENTIALLY MODIFIED' : 'UNVERIFIED / MIXED';
+  const verdictLow  = isImageTab ? 'MANIPULATED / FAKE IMAGE' : 'FAKE / MISLEADING CONTENT';
+  const verdictLabel = authScore >= authThreshHigh ? verdictHigh : authScore >= authThreshMid ? verdictMid : verdictLow;
+  const verdictYesNo = authScore >= authThreshHigh ? '✓' : '✗';
 
   return (
     <main style={{ maxWidth: 960, margin: '0 auto', padding: '48px 24px' }}>
@@ -226,30 +239,39 @@ export default function UploadPage() {
 
               {/* Top Verdict Header */}
               <div style={{ 
-                background: authScore >= 75 ? 'var(--verified-bg)' : authScore >= 45 ? 'var(--suspicious-bg)' : 'var(--fake-bg)', 
-                border: `1px solid ${authScore >= 75 ? 'var(--verified)' : authScore >= 45 ? 'var(--suspicious)' : 'var(--fake)'}`,
+                background: authScore >= authThreshHigh ? 'var(--verified-bg)' : authScore >= authThreshMid ? 'var(--suspicious-bg)' : 'var(--fake-bg)', 
+                border: `1px solid ${authScore >= authThreshHigh ? 'var(--verified)' : authScore >= authThreshMid ? 'var(--suspicious)' : 'var(--fake)'}`,
                 borderRadius:'var(--radius-lg)', padding:'24px 32px', textAlign:'center', position:'relative', overflow:'hidden'
               }}>
-                <div style={{ position:'absolute', top:0, left:0, width:6, height:'100%', background: authScore >= 75 ? 'var(--verified)' : authScore >= 45 ? 'var(--suspicious)' : 'var(--fake)' }} />
+                <div style={{ position:'absolute', top:0, left:0, width:6, height:'100%', background: authScore >= authThreshHigh ? 'var(--verified)' : authScore >= authThreshMid ? 'var(--suspicious)' : 'var(--fake)' }} />
                 <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:24 }}>
                   <div style={{ 
                     fontSize:'var(--text-6xl)', fontWeight:950, 
-                    color: authScore >= 75 ? 'var(--verified)' : authScore >= 45 ? 'var(--suspicious)' : 'var(--fake)',
+                    color: authScore >= authThreshHigh ? 'var(--verified)' : authScore >= authThreshMid ? 'var(--suspicious)' : 'var(--fake)',
                     lineHeight:1
                   }}>
-                    {authScore >= 75 ? 'YES' : 'NO'}
+                    {verdictYesNo}
                   </div>
                   <div style={{ textAlign:'left' }}>
                     <h2 className="font-syne" style={{ 
                       fontSize:'var(--text-2xl)', fontWeight:900, letterSpacing:'0.05em', 
-                      color: authScore >= 75 ? 'var(--verified)' : authScore >= 45 ? 'var(--suspicious)' : 'var(--fake)',
+                      color: authScore >= authThreshHigh ? 'var(--verified)' : authScore >= authThreshMid ? 'var(--suspicious)' : 'var(--fake)',
                       margin:0
                     }}>
-                      VERDICT: {authScore >= 75 ? 'AUTHENTIC / REAL NEWS' : authScore >= 45 ? 'UNVERIFIED / MIXED' : 'FAKE / MISLEADING CONTENT'}
+                      VERDICT: {verdictLabel}
                     </h2>
                     <p style={{ color:'var(--text-primary)', marginTop:4, fontSize:'var(--text-md)', fontWeight:500, opacity:0.9, maxWidth:500 }}>
                       {explanation}
                     </p>
+                    {isImageTab && manipulationDetected && manipulationTypes.length > 0 && (
+                      <div style={{ marginTop:12, display:'flex', flexWrap:'wrap', gap:6 }}>
+                        {manipulationTypes.map((t: string) => (
+                          <span key={t} style={{ padding:'3px 10px', borderRadius:'var(--radius-full)', background:'rgba(239,68,68,0.15)', border:'1px solid rgba(239,68,68,0.4)', fontSize:'var(--text-xs)', color:'var(--fake)', fontWeight:700 }}>
+                            ⚠ {t}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
