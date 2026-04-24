@@ -21,7 +21,7 @@ export async function GET(request: Request, context: any) {
        });
     }
 
-    const status = JSON.parse(statusRaw);
+    const status = typeof statusRaw === 'string' ? JSON.parse(statusRaw) : statusRaw;
 
     // If complete, return the full report
     if (status.state === 'SUCCESS') {

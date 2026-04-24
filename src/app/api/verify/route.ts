@@ -64,48 +64,48 @@ export async function POST(request: Request) {
     
     (async () => {
        try {
-         await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'RUNNING', progress: 10, stage: 'Uploading' }));
+         await redis.set(`job:status:${jobId}`, JSON.stringify({ state: 'RUNNING', progress: 10, stage: 'Uploading' }), { ex: 3600 });
 
          // ── IMAGE ──────────────────────────────────────────────────────
          if (image || (fileMeta && fileMeta.type.startsWith('image/'))) {
-           await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'RUNNING', progress: 40, stage: 'Running AI analysis...' }));
+           await redis.set(`job:status:${jobId}`, JSON.stringify({ state: 'RUNNING', progress: 40, stage: 'Running AI analysis...' }), { ex: 3600 });
            const hfEngine = new HuggingFaceService();
            const finalAnalysis = await hfEngine.analyzeDeepfake(image!);
            const prisma = getPrisma();
            if (prisma) {
              await prisma.verificationReport.create({ data: { content: 'Image Deepfake Analysis', authenticityScore: finalAnalysis.authenticity_score, aiGeneratedProb: finalAnalysis.ai_generated_probability, explanation: finalAnalysis.explanation, category: 'Technology', status: 'approved' } });
            }
-           await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'SUCCESS', result: finalAnalysis }));
+           await redis.set(`job:status:${jobId}`, JSON.stringify({ state: 'SUCCESS', result: finalAnalysis }), { ex: 3600 });
            return;
          }
 
          // ── VIDEO ──────────────────────────────────────────────────────
          if (fileMeta && fileMeta.type.startsWith('video/') && fileBuffer) {
-           await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'RUNNING', progress: 30, stage: 'Searching trusted sources...' }));
+           await redis.set(`job:status:${jobId}`, JSON.stringify({ state: 'RUNNING', progress: 30, stage: 'Searching trusted sources...' }), { ex: 3600 });
            await new Promise(r => setTimeout(r, 700));
-           await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'RUNNING', progress: 65, stage: 'Running AI analysis...' }));
+           await redis.set(`job:status:${jobId}`, JSON.stringify({ state: 'RUNNING', progress: 65, stage: 'Running AI analysis...' }), { ex: 3600 });
            const videoEngine = new VideoDeepfakeService();
            const finalAnalysis = await videoEngine.analyzeDeepfake(fileBuffer, fileMeta.name);
            const prisma = getPrisma();
            if (prisma) {
              await prisma.verificationReport.create({ data: { content: `Video Deepfake Analysis: ${fileMeta.name}`, authenticityScore: finalAnalysis.authenticity_score, aiGeneratedProb: finalAnalysis.ai_generated_probability, explanation: finalAnalysis.explanation, category: 'Technology', status: 'approved' } });
            }
-           await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'SUCCESS', result: finalAnalysis }));
+           await redis.set(`job:status:${jobId}`, JSON.stringify({ state: 'SUCCESS', result: finalAnalysis }), { ex: 3600 });
            return;
          }
 
          // ── AUDIO ──────────────────────────────────────────────────────
          if (fileMeta && fileMeta.type.startsWith('audio/') && fileBuffer) {
-           await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'RUNNING', progress: 30, stage: 'Searching trusted sources...' }));
+           await redis.set(`job:status:${jobId}`, JSON.stringify({ state: 'RUNNING', progress: 30, stage: 'Searching trusted sources...' }), { ex: 3600 });
            await new Promise(r => setTimeout(r, 500));
-           await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'RUNNING', progress: 65, stage: 'Running AI analysis...' }));
+           await redis.set(`job:status:${jobId}`, JSON.stringify({ state: 'RUNNING', progress: 65, stage: 'Running AI analysis...' }), { ex: 3600 });
            const audioEngine = new AudioDeepfakeService();
            const finalAnalysis = await audioEngine.analyzeDeepfake(fileBuffer);
            const prisma = getPrisma();
            if (prisma) {
              await prisma.verificationReport.create({ data: { content: `Audio Deepfake Analysis: ${fileMeta.name}`, authenticityScore: finalAnalysis.authenticity_score, aiGeneratedProb: finalAnalysis.ai_generated_probability, explanation: finalAnalysis.explanation, category: 'Technology', status: 'approved' } });
            }
-           await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'SUCCESS', result: finalAnalysis }));
+           await redis.set(`job:status:${jobId}`, JSON.stringify({ state: 'SUCCESS', result: finalAnalysis }), { ex: 3600 });
            return;
          }
 
@@ -113,13 +113,13 @@ export async function POST(request: Request) {
          let claimToVerify = claim;
 
          if (url) {
-           await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'RUNNING', progress: 30, stage: 'Fetching related news...' }));
+           await redis.set(`job:status:${jobId}`, JSON.stringify({ state: 'RUNNING', progress: 30, stage: 'Fetching related news...' }), { ex: 3600 });
            const scraper = new ArticleScraperService();
            const articleText = await scraper.scrapeArticle(url);
            claimToVerify = `The following is an article from ${url}:\n\n${articleText}`;
          }
 
-         await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'RUNNING', progress: 50, stage: 'Comparing multiple sources...' }));
+         await redis.set(`job:status:${jobId}`, JSON.stringify({ state: 'RUNNING', progress: 50, stage: 'Comparing multiple sources...' }), { ex: 3600 });
          const factChecker = new GoogleFactCheckService();
          const aiEngine = new GroqService();
          const searchEngine = new TavilySearchService();
@@ -129,7 +129,7 @@ export async function POST(request: Request) {
            searchEngine.searchContext(url || claim)
          ]);
 
-         await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'RUNNING', progress: 80, stage: 'Scanning news database...' }));
+         await redis.set(`job:status:${jobId}`, JSON.stringify({ state: 'RUNNING', progress: 80, stage: 'Scanning news database...' }), { ex: 3600 });
 
          let supporting_articles: any[] = [];
          const prisma = getPrisma();
@@ -174,7 +174,7 @@ export async function POST(request: Request) {
            console.error("Supporting evidence retrieval error:", err);
          }
          
-         await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'RUNNING', progress: 95, stage: 'Synthesizing final verdict...' }));
+         await redis.set(`job:status:${jobId}`, JSON.stringify({ state: 'RUNNING', progress: 95, stage: 'Synthesizing final verdict...' }), { ex: 3600 });
          
          const finalAnalysis = await aiEngine.synthesizeResults(claimToVerify, factCheckData, searchContext, supporting_articles);
          
@@ -201,10 +201,10 @@ export async function POST(request: Request) {
            });
          }
 
-         await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'SUCCESS', result: { ...finalAnalysis, supporting_articles: safeSupporting } }));
+         await redis.set(`job:status:${jobId}`, JSON.stringify({ state: 'SUCCESS', result: { ...finalAnalysis, supporting_articles: safeSupporting } }), { ex: 3600 });
 
        } catch (err: any) {
-         await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'FAILURE', error: err.message }));
+         await redis.set(`job:status:${jobId}`, JSON.stringify({ state: 'FAILURE', error: err.message }), { ex: 3600 });
        }
     })().catch(console.error);
 

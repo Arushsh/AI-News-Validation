@@ -1,9 +1,7 @@
-import Redis from 'ioredis';
+import { Redis } from '@upstash/redis';
 
-const globalForRedis = global as unknown as { redis: Redis };
-
-export const redis =
-  globalForRedis.redis ||
-  new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-
-if (process.env.NODE_ENV !== 'production') globalForRedis.redis = redis;
+// Use the REST client for better performance on serverless (Netlify/Vercel)
+export const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
