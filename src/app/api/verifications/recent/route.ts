@@ -10,6 +10,7 @@ export async function GET() {
       orderBy: { createdAt: 'desc' },
       take: 3,
       select: {
+        id: true,
         title: true,
         category: true,
         authenticityScore: true,
@@ -19,6 +20,7 @@ export async function GET() {
     });
 
     const results = reports.map(r => ({
+      id: r.id,
       title: r.title || 'Untitled Verification',
       category: r.category || 'General',
       score: r.authenticityScore,

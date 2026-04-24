@@ -198,7 +198,7 @@ export default function LandingPage() {
         </div>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:24 }} className="recent-grid">
           {recent.length > 0 ? (
-            recent.map((item, index) => <NewsCard key={item.title} {...item} index={index} />)
+            recent.map((item, index) => <NewsCard key={item.id} {...item} index={index} />)
           ) : (
              Array.from({length:3}).map((_, i) => (
                 <div key={i} className="skeleton" style={{ height:320, borderRadius:'var(--radius-lg)', background:'var(--bg-elevated)', border:'1px solid var(--border)' }} />

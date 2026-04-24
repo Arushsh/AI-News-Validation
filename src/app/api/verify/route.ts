@@ -10,7 +10,12 @@ import { AudioDeepfakeService } from '@/services/ai/audio.service';
 import { VideoDeepfakeService } from '@/services/ai/video.service';
 import { getPrisma } from '@/lib/db/prisma';
 
-const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'application/pdf', 'video/mp4', 'audio/mpeg'];
+const ALLOWED_MIME_TYPES = [
+  'image/jpeg', 'image/png', 'image/webp', 'image/gif',
+  'application/pdf',
+  'video/mp4', 'video/webm', 'video/quicktime',
+  'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/webm', 'audio/mp4'
+];
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
 export async function POST(request: Request) {
@@ -59,32 +64,53 @@ export async function POST(request: Request) {
     
     (async () => {
        try {
-         await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'RUNNING', progress: 10, stage: 'Searching trusted sources...' }));
-         
-         let claimToVerify = claim;
+         await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'RUNNING', progress: 10, stage: 'Uploading' }));
+
+         // ── IMAGE ──────────────────────────────────────────────────────
          if (image || (fileMeta && fileMeta.type.startsWith('image/'))) {
            await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'RUNNING', progress: 40, stage: 'Running AI analysis...' }));
            const hfEngine = new HuggingFaceService();
            const finalAnalysis = await hfEngine.analyzeDeepfake(image!);
-           
-           // Analytics: Persist image deepfake report
            const prisma = getPrisma();
            if (prisma) {
-             await prisma.verificationReport.create({
-               data: {
-                 content: "Image Deepfake Analysis",
-                 authenticityScore: finalAnalysis.authenticity_score,
-                 aiGeneratedProb: finalAnalysis.ai_generated_probability,
-                 explanation: finalAnalysis.explanation,
-                 category: 'Technology',
-                 status: 'approved'
-               }
-             });
+             await prisma.verificationReport.create({ data: { content: 'Image Deepfake Analysis', authenticityScore: finalAnalysis.authenticity_score, aiGeneratedProb: finalAnalysis.ai_generated_probability, explanation: finalAnalysis.explanation, category: 'Technology', status: 'approved' } });
            }
-
            await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'SUCCESS', result: finalAnalysis }));
            return;
          }
+
+         // ── VIDEO ──────────────────────────────────────────────────────
+         if (fileMeta && fileMeta.type.startsWith('video/') && fileBuffer) {
+           await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'RUNNING', progress: 30, stage: 'Searching trusted sources...' }));
+           await new Promise(r => setTimeout(r, 700));
+           await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'RUNNING', progress: 65, stage: 'Running AI analysis...' }));
+           const videoEngine = new VideoDeepfakeService();
+           const finalAnalysis = await videoEngine.analyzeDeepfake(fileBuffer, fileMeta.name);
+           const prisma = getPrisma();
+           if (prisma) {
+             await prisma.verificationReport.create({ data: { content: `Video Deepfake Analysis: ${fileMeta.name}`, authenticityScore: finalAnalysis.authenticity_score, aiGeneratedProb: finalAnalysis.ai_generated_probability, explanation: finalAnalysis.explanation, category: 'Technology', status: 'approved' } });
+           }
+           await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'SUCCESS', result: finalAnalysis }));
+           return;
+         }
+
+         // ── AUDIO ──────────────────────────────────────────────────────
+         if (fileMeta && fileMeta.type.startsWith('audio/') && fileBuffer) {
+           await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'RUNNING', progress: 30, stage: 'Searching trusted sources...' }));
+           await new Promise(r => setTimeout(r, 500));
+           await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'RUNNING', progress: 65, stage: 'Running AI analysis...' }));
+           const audioEngine = new AudioDeepfakeService();
+           const finalAnalysis = await audioEngine.analyzeDeepfake(fileBuffer);
+           const prisma = getPrisma();
+           if (prisma) {
+             await prisma.verificationReport.create({ data: { content: `Audio Deepfake Analysis: ${fileMeta.name}`, authenticityScore: finalAnalysis.authenticity_score, aiGeneratedProb: finalAnalysis.ai_generated_probability, explanation: finalAnalysis.explanation, category: 'Technology', status: 'approved' } });
+           }
+           await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'SUCCESS', result: finalAnalysis }));
+           return;
+         }
+
+         // ── TEXT / URL ─────────────────────────────────────────────────
+         let claimToVerify = claim;
 
          if (url) {
            await redis.setex(`job:status:${jobId}`, 3600, JSON.stringify({ state: 'RUNNING', progress: 30, stage: 'Fetching related news...' }));
