@@ -7,6 +7,11 @@ export const getPrisma = () => {
     if (!globalForPrisma.prisma) {
       globalForPrisma.prisma = new PrismaClient({
         log: ['error'],
+        datasources: {
+          db: {
+            url: process.env.DATABASE_URL,
+          },
+        },
       });
     }
     return globalForPrisma.prisma;
