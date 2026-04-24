@@ -8,3 +8,5 @@
 [build.environment]
   NEXT_USE_NETLIFY_EDGE = "true"
   PRISMA_SKIP_POSTINSTALL_GENERATE = "true"
+  NEXT_DISABLE_ESLINT = "1"
+  NEXT_COMPILER_EMOTION = "true"
