@@ -6,6 +6,6 @@
   package = "@netlify/plugin-nextjs"
 
 [build.environment]
-  NEXT_USE_NETLIFY_EDGE = "true"
+  NEXT_USE_NETLIFY_EDGE = "false"
   NEXT_DISABLE_ESLINT = "1"
   NEXT_COMPILER_EMOTION = "true"
