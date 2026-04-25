@@ -1,10 +1,22 @@
 "use client";
-import { Mail, MapPin, Phone, MessageSquare, Send } from 'lucide-react';
+import { MessageSquare, Send } from 'lucide-react';
 import { Card, PrimaryButton } from '@/components/ui/primitives';
 import { useState } from 'react';
 
 export default function ContactPage() {
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    // Small delay to simulate processing and make it feel premium
+    setTimeout(() => {
+      setLoading(false);
+      setSent(true);
+    }, 1000);
+  };
 
   return (
     <main style={{ maxWidth: 1280, margin: '0 auto', padding: '80px 24px', minHeight: 'calc(100vh - 64px)' }}>
@@ -21,9 +33,9 @@ export default function ContactPage() {
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 5fr) minmax(0, 3fr)', gap: 48 }} className="contact-grid">
+      <div style={{ maxWidth: 800, margin: '0 auto' }}>
         {/* Contact Form */}
-        <Card style={{ padding: 40, background: 'var(--bg-surface)' }}>
+        <Card style={{ padding: 'min(60px, 8vw)', background: 'var(--bg-surface)' }}>
           <h2 className="font-syne" style={{ fontSize: 'var(--text-2xl)', fontWeight: 800, marginBottom: 32 }}>Send us a Message</h2>
           
           {sent ? (
@@ -32,97 +44,54 @@ export default function ContactPage() {
                 <Send size={32} color="var(--verified)" />
               </div>
               <h3 className="font-syne" style={{ fontSize: 'var(--text-xl)', fontWeight: 800, marginBottom: 8, color: 'var(--text-primary)' }}>Message Sent Successfully!</h3>
-              <p style={{ color: 'var(--text-secondary)' }}>Our support team will get back to you within 24 hours.</p>
+              <p style={{ color: 'var(--text-secondary)' }}>Thank you for reaching out. Our support team will get back to you within 24 hours.</p>
+              <PrimaryButton onClick={() => setSent(false)} style={{ marginTop: 24 }}>Send Another Message</PrimaryButton>
             </div>
           ) : (
-            <form onSubmit={(e) => { e.preventDefault(); setSent(true); }} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }} className="form-row">
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   <label style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-secondary)' }}>First Name</label>
-                  <input required type="text" placeholder="John" style={{ width: '100%', padding: '12px 16px', borderRadius: 'var(--radius-md)', background: 'var(--bg-input)', border: '1px solid var(--border)', color: 'var(--text-primary)', outline: 'none', transition: 'border-color 200ms' }} onFocus={e=>(e.target.style.borderColor='var(--cyan)')} onBlur={e=>(e.target.style.borderColor='var(--border)')} />
+                  <input name="firstName" required type="text" placeholder="John" style={{ width: '100%', padding: '12px 16px', borderRadius: 'var(--radius-md)', background: 'var(--bg-input)', border: '1px solid var(--border)', color: 'var(--text-primary)', outline: 'none', transition: 'border-color 200ms' }} onFocus={e=>(e.target.style.borderColor='var(--cyan)')} onBlur={e=>(e.target.style.borderColor='var(--border)')} />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   <label style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-secondary)' }}>Last Name</label>
-                  <input required type="text" placeholder="Doe" style={{ width: '100%', padding: '12px 16px', borderRadius: 'var(--radius-md)', background: 'var(--bg-input)', border: '1px solid var(--border)', color: 'var(--text-primary)', outline: 'none', transition: 'border-color 200ms' }} onFocus={e=>(e.target.style.borderColor='var(--cyan)')} onBlur={e=>(e.target.style.borderColor='var(--border)')} />
+                  <input name="lastName" required type="text" placeholder="Doe" style={{ width: '100%', padding: '12px 16px', borderRadius: 'var(--radius-md)', background: 'var(--bg-input)', border: '1px solid var(--border)', color: 'var(--text-primary)', outline: 'none', transition: 'border-color 200ms' }} onFocus={e=>(e.target.style.borderColor='var(--cyan)')} onBlur={e=>(e.target.style.borderColor='var(--border)')} />
                 </div>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <label style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-secondary)' }}>Email Address</label>
-                <input required type="email" placeholder="john@example.com" style={{ width: '100%', padding: '12px 16px', borderRadius: 'var(--radius-md)', background: 'var(--bg-input)', border: '1px solid var(--border)', color: 'var(--text-primary)', outline: 'none', transition: 'border-color 200ms' }} onFocus={e=>(e.target.style.borderColor='var(--cyan)')} onBlur={e=>(e.target.style.borderColor='var(--border)')} />
+                <input name="email" required type="email" placeholder="john@example.com" style={{ width: '100%', padding: '12px 16px', borderRadius: 'var(--radius-md)', background: 'var(--bg-input)', border: '1px solid var(--border)', color: 'var(--text-primary)', outline: 'none', transition: 'border-color 200ms' }} onFocus={e=>(e.target.style.borderColor='var(--cyan)')} onBlur={e=>(e.target.style.borderColor='var(--border)')} />
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <label style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-secondary)' }}>Subject</label>
-                <select required style={{ width: '100%', padding: '12px 16px', borderRadius: 'var(--radius-md)', background: 'var(--bg-input)', border: '1px solid var(--border)', color: 'var(--text-primary)', outline: 'none', appearance: 'none' }}>
-                  <option value="support">General Support</option>
-                  <option value="api">API Access</option>
-                  <option value="enterprise">Enterprise Integration</option>
-                  <option value="press">Press & Media</option>
+                <select name="subject" required style={{ width: '100%', padding: '12px 16px', borderRadius: 'var(--radius-md)', background: 'var(--bg-input)', border: '1px solid var(--border)', color: 'var(--text-primary)', outline: 'none', appearance: 'none' }}>
+                  <option value="General Support">General Support</option>
+                  <option value="API Access">API Access</option>
+                  <option value="Enterprise Integration">Enterprise Integration</option>
+                  <option value="Press & Media">Press & Media</option>
                 </select>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <label style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-secondary)' }}>Message</label>
-                <textarea required rows={5} placeholder="How can we help you?" style={{ width: '100%', padding: '12px 16px', borderRadius: 'var(--radius-md)', background: 'var(--bg-input)', border: '1px solid var(--border)', color: 'var(--text-primary)', outline: 'none', resize: 'vertical', transition: 'border-color 200ms' }} onFocus={e=>(e.target.style.borderColor='var(--cyan)')} onBlur={e=>(e.target.style.borderColor='var(--border)')} />
+                <textarea name="message" required rows={5} placeholder="How can we help you?" style={{ width: '100%', padding: '12px 16px', borderRadius: 'var(--radius-md)', background: 'var(--bg-input)', border: '1px solid var(--border)', color: 'var(--text-primary)', outline: 'none', resize: 'vertical', transition: 'border-color 200ms' }} onFocus={e=>(e.target.style.borderColor='var(--cyan)')} onBlur={e=>(e.target.style.borderColor='var(--border)')} />
               </div>
 
-              <PrimaryButton type="submit" style={{ padding: '16px', marginTop: 12, display: 'flex', justifyContent: 'center', gap: 12 }}>
-                Send Message <Send size={18} />
+              <PrimaryButton type="submit" disabled={loading} style={{ padding: '16px', marginTop: 12, display: 'flex', justifyContent: 'center', gap: 12 }}>
+                {loading ? 'Sending Message...' : (
+                  <>Send Message <Send size={18} /></>
+                )}
               </PrimaryButton>
             </form>
           )}
+
         </Card>
-
-        {/* Contact Info Sidebar */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-          <Card style={{ padding: 32, background: 'var(--bg-elevated)' }}>
-            <h3 className="font-syne" style={{ fontSize: 'var(--text-xl)', fontWeight: 800, marginBottom: 24 }}>Contact Information</h3>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-              <div style={{ display: 'flex', gap: 16 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-md)', background: 'var(--cyan-dim)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Mail size={20} color="var(--cyan)" />
-                </div>
-                <div>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)', marginBottom: 4 }}>Email Support</div>
-                  <a href="mailto:support@verifylens.ai" style={{ color: 'var(--text-primary)', fontWeight: 600, textDecoration: 'none' }}>support@verifylens.ai</a>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: 16 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-md)', background: 'var(--cyan-dim)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Phone size={20} color="var(--cyan)" />
-                </div>
-                <div>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)', marginBottom: 4 }}>Phone Inquiry</div>
-                  <div style={{ color: 'var(--text-primary)', fontWeight: 600 }}>+1 (800) 555-0199</div>
-                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginTop: 4 }}>Mon-Fri from 9am to 6pm EST</div>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: 16 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-md)', background: 'var(--cyan-dim)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <MapPin size={20} color="var(--cyan)" />
-                </div>
-                <div>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)', marginBottom: 4 }}>Headquarters</div>
-                  <div style={{ color: 'var(--text-primary)', fontWeight: 600, lineHeight: 1.5 }}>
-                    100 Innovation Blvd.<br />
-                    Suite 400<br />
-                    San Francisco, CA 94107
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Card>
-        </div>
       </div>
 
       <style>{`
-        @media (max-width: 1024px) {
-          .contact-grid { grid-template-columns: 1fr !important; }
-        }
         @media (max-width: 640px) {
           .form-row { grid-template-columns: 1fr !important; }
         }
@@ -130,3 +99,4 @@ export default function ContactPage() {
     </main>
   );
 }
+

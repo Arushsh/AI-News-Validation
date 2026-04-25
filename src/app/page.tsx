@@ -267,9 +267,9 @@ export default function LandingPage() {
           </div>
 
           <div style={{ borderTop:'1px solid var(--border)', paddingTop:40, display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:16 }}>
-             <p style={{ color:'var(--text-muted)', fontSize:'var(--text-xs)' }}>© 2026 Veridex AI. All rights reserved.</p>
+             <p style={{ color:'var(--text-muted)', fontSize:'var(--text-xs)' }}>© 2026 Verifylens. All rights reserved.</p>
              <div style={{ display:'flex', gap:24 }}>
-               <span style={{ color:'var(--text-muted)', fontSize:'var(--text-xs)' }}>Hardware by NVIDIA</span>
+               {/* <span style={{ color:'var(--text-muted)', fontSize:'var(--text-xs)' }}>Hardware by NVIDIA</span> */}
                <span style={{ color:'var(--text-muted)', fontSize:'var(--text-xs)' }}>Powered by Groq</span>
                <span style={{ color:'var(--text-muted)', fontSize:'var(--text-xs)' }}>Search by Tavily</span>
              </div>
