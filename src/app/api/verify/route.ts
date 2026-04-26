@@ -8,7 +8,9 @@ import { HuggingFaceService } from '@/services/ai/huggingface.service';
 import { ArticleScraperService } from '@/services/scraper/article-scraper.service';
 import { AudioDeepfakeService } from '@/services/ai/audio.service';
 import { VideoDeepfakeService } from '@/services/ai/video.service';
+import { GroqVisionService } from '@/services/ai/groq-vision.service';
 import { getPrisma } from '@/lib/db/prisma';
+
 
 const ALLOWED_MIME_TYPES = [
   'image/jpeg', 'image/png', 'image/webp', 'image/gif',
@@ -66,18 +68,69 @@ export async function POST(request: Request) {
        try {
          await redis.set(`job:status:${jobId}`, JSON.stringify({ state: 'RUNNING', progress: 10, stage: 'Uploading' }), { ex: 3600 });
 
-         // ── IMAGE ──────────────────────────────────────────────────────
-         if (image || (fileMeta && fileMeta.type.startsWith('image/'))) {
-           await redis.set(`job:status:${jobId}`, JSON.stringify({ state: 'RUNNING', progress: 40, stage: 'Running AI analysis...' }), { ex: 3600 });
-           const hfEngine = new HuggingFaceService();
-           const finalAnalysis = await hfEngine.analyzeDeepfake(image!);
-           const prisma = getPrisma();
-           if (prisma) {
-             await prisma.verificationReport.create({ data: { content: 'Image Deepfake Analysis', authenticityScore: finalAnalysis.authenticity_score, aiGeneratedProb: finalAnalysis.ai_generated_probability, explanation: finalAnalysis.explanation, category: 'Technology', status: 'approved' } });
-           }
-           await redis.set(`job:status:${jobId}`, JSON.stringify({ state: 'SUCCESS', result: finalAnalysis }), { ex: 3600 });
-           return;
-         }
+          // ── IMAGE ──────────────────────────────────────────────────────
+          if (image || (fileMeta && fileMeta.type.startsWith('image/'))) {
+            await redis.set(`job:status:${jobId}`, JSON.stringify({ state: 'RUNNING', progress: 30, stage: 'Scanning for AI patterns...' }), { ex: 3600 });
+            
+            const hfEngine = new HuggingFaceService();
+            const visionEngine = new GroqVisionService();
+            
+            // Run both in parallel for efficiency
+            const [hfAnalysis, visionAnalysis] = await Promise.all([
+              hfEngine.analyzeDeepfake(image!).catch(e => null),
+              visionEngine.analyzeImage(image!).catch(e => null)
+            ]);
+
+            // Synthesize results: trust Vision more for detailed forensics, HF for pattern matching
+            let finalAnalysis: any = hfAnalysis;
+            if (visionAnalysis && !visionAnalysis.isError && visionAnalysis.authenticity_score !== undefined) {
+              // Pessimistic scoring: if any engine detects manipulation, reflect the lower trust score
+              const finalScore = hfAnalysis 
+                ? Math.min(hfAnalysis.authenticity_score, visionAnalysis.authenticity_score)
+                : visionAnalysis.authenticity_score;
+              
+              const finalAiProb = hfAnalysis
+                ? Math.max(hfAnalysis.ai_generated_probability, visionAnalysis.ai_generated_probability)
+                : visionAnalysis.ai_generated_probability;
+
+
+              finalAnalysis = {
+                ...visionAnalysis,
+                authenticity_score: finalScore,
+                ai_generated_probability: finalAiProb,
+                explanation: `[Forensic Vision Scan] ${visionAnalysis.explanation} ${hfAnalysis?.explanation || ''}`,
+                sources_analyzed: [
+                  ...(visionAnalysis.sources_analyzed || []),
+                  ...(hfAnalysis?.sources_analyzed || [])
+                ]
+              };
+
+            } else if (hfAnalysis) {
+               // Fallback to pure HF if Vision failed
+               finalAnalysis = hfAnalysis;
+               if (visionAnalysis?.isError) {
+                 finalAnalysis.explanation = `${hfAnalysis.explanation} (Note: Deep forensic vision scan was unavailable: ${visionAnalysis.explanation})`;
+               }
+            }
+
+
+            const prisma = getPrisma();
+            if (prisma) {
+              await prisma.verificationReport.create({ 
+                data: { 
+                  content: 'Image Forensic Analysis', 
+                  authenticityScore: finalAnalysis.authenticity_score, 
+                  aiGeneratedProb: finalAnalysis.ai_generated_probability, 
+                  explanation: finalAnalysis.explanation, 
+                  category: 'Technology', 
+                  status: 'approved' 
+                } 
+              });
+            }
+            await redis.set(`job:status:${jobId}`, JSON.stringify({ state: 'SUCCESS', result: finalAnalysis }), { ex: 3600 });
+            return;
+          }
+
 
          // ── VIDEO ──────────────────────────────────────────────────────
          if (fileMeta && fileMeta.type.startsWith('video/') && fileBuffer) {

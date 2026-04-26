@@ -101,7 +101,8 @@ export class HuggingFaceService {
       ? err
       : aiProb > 50
         ? `${modelShortName} AI detector identified synthetic diffusion-model generation patterns with ${aiProb}% confidence.`
-        : `${modelShortName} AI detector verified this as authentic camera footage with ${authentic}% confidence.`;
+        : `${modelShortName} AI detector found no significant synthetic generation artifacts (${authentic}% authenticity confidence).`;
+
 
     return {
       authenticity_score: authentic,
