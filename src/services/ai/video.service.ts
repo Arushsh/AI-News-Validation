@@ -10,10 +10,15 @@ export class VideoDeepfakeService {
       throw new Error("Missing SIGHTENGINE_API_USER or SIGHTENGINE_API_SECRET. Please add these to .env.local");
     }
 
+    console.log(`[Sightengine] Using API User: ${this.apiUser}`);
+
+
     const form = new FormData();
     form.append('media', buffer, { filename });
     form.append('models', 'deepfake');
+    form.append('interval', '2'); // Check every 2 seconds to save quota
     form.append('api_user', this.apiUser);
+
     form.append('api_secret', this.apiSecret);
 
     try {
@@ -73,10 +78,11 @@ export class VideoDeepfakeService {
           authenticity_score: 75,
           ai_generated_probability: 25,
           manipulation_detected: false,
-          explanation: `Video analysis quota reached on the Sightengine free tier. A definitive deepfake verdict could not be rendered for this video. Please try again later or upgrade your Sightengine plan for unlimited video analysis.`,
+          explanation: `Sightengine Video Quota Reached. The free tier only allows 1-2 video analyses per day because deepfake detection is "operation-heavy". I've optimized your settings to check frames every 2 seconds to save quota, but you may need to wait 24 hours for your daily limit to reset.`,
           sources_analyzed: [
-            { name: "Sightengine (Quota Exceeded)", url: "https://sightengine.com/pricing", stance: "supporting" }
+            { name: "Sightengine (Daily Quota Hit)", url: "https://sightengine.com/pricing", stance: "supporting" }
           ],
+
           extracted_claim: `Video forensics of ${filename}`,
           confidence: 'QUOTA_EXCEEDED',
         };
